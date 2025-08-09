@@ -1,0 +1,20 @@
+{
+  "name": "จดบันทึก | Song Diary",
+  "short_name": "SongDiary",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f4ede1",
+  "theme_color": "#f4ede1",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
