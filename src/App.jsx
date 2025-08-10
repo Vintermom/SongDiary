@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { t, getLang, setLang, SECTIONS, KEYS, INSTRUMENTS } from './i18n.js';
-import { listNotes, saveNote, deleteNote, getNote, ensureSample } from './storage.js';
+import { list, save, del, ensureSample } from './storage.js';
 import './theme.css';
 
 function useLang() {
