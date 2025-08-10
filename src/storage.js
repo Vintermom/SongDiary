@@ -18,11 +18,6 @@ export function ensureSample() {
   if (listNotes().length) return false;
   const now = new Date().toISOString();
   const note = {
-}    
-export function ensureSample() {
-  if (listNotes().length) return false;
-  const now = new Date().toISOString();
-  const note = {
     id: crypto.randomUUID(),
     title_th: 'วันสดใสในฤดูร้อน',
     title_en: 'Summer Pop Day',
@@ -46,4 +41,3 @@ export function ensureSample() {
   saveNote(note);
   return true;
 }
-
