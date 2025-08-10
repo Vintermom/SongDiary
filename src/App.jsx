@@ -9,7 +9,6 @@ function Header({ langApi, onHome, onNew, onSearch, query }){
   const theme=document.documentElement.classList.contains('dark')?'dark':'light';
   function toggle(){ document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark')?'dark':'light'); }
   return (<div className="header">
-    <div className="brand">{t('appName')}</div>
     <div className="toolbar">
       <input className="input" style={{minWidth:180}} placeholder={t('search')} value={query} onChange={e=>onSearch(e.target.value)} />
       <select className="select" value={lang} onChange={e=>setLang(e.target.value)} aria-label={t('language')}><option value="th">ไทย</option><option value="en">English</option></select>
@@ -57,10 +56,21 @@ function Editor({ langApi, id, onHome }){
   const [instrument,setInstrument]=useState('Guitar');
   useEffect(()=>{ window.scrollTo({top:0,behavior:'smooth'}); },[]);
   const timestamp=useMemo(()=>{ const d=new Date(); const tz=Intl.DateTimeFormat().resolvedOptions().timeZone; const s=d.toLocaleString(undefined,{timeZoneName:'short'}); return `${s} (${tz})`; },[title,penName,lyrics,mood,notes,section,introType,instrument]);
-  function insertSection(){ let label=section; if(section==='Intro'){ if(introType==='Riff') label=`Intro — Riff (${instrument})`; else if(introType==='Instrument') label=`Intro — Instrument (${instrument})`; } else if(section==='Solo'){ label=`Solo (${instrument})`; } setLyrics(prev=>(prev?prev+'\n':'')+label+'\n'); }
+  function insertSection(){
+    let label = section;
+    if(section==='Intro'){
+      if(introType==='Riff') label = `[Intro - Riff (${instrument})]`;
+      else if(introType==='Instrument') label = `[Intro - Instrument (${instrument})]`;
+      else label = `[Intro]`;
+    } else if(section==='Solo'){ label = `[Solo (${instrument})]`; }
+    else { label = `[${section}]`; }
+    setLyrics(prev => (prev?prev+'\n':'') + label + '\n');
+  }
   function onSave(){ const now=new Date().toISOString(); const data={ id:existing?.id||crypto.randomUUID(), title, penName, mood, lyrics, notes, updatedAt:now }; saveNote(data); showModal(t('updated')); onHome(); }
   function copyLyrics(){ navigator.clipboard.writeText(lyrics); toast('Copied'); }
-  function printPDF(){ const w=window.open('','_blank'); const titleTxt=title||'Untitled'; const html=`<!doctype html><html><head><meta charset="utf-8"><title>${titleTxt}</title><style>body{font-family:'Sarabun','Noto Sans Thai',Arial,sans-serif;padding:24px;}h1{margin:0 0 8px;}.muted{color:#666;font-size:12px;margin-bottom:16px;}pre{white-space:pre-wrap;word-break:break-word;}</style></head><body><h1>${titleTxt}</h1><div class="muted">${t('timestamp')}: ${new Date().toLocaleString(undefined,{timeZoneName:'short'})} (${Intl.DateTimeFormat().resolvedOptions().timeZone})</div><pre>${(lyrics||'').replace(/[&<>]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]))}</pre></body></html>`; w.document.write(html); w.document.close(); w.focus(); w.print(); }
+  function printPDF(){ const w=window.open('','_blank'); const titleTxt=title||'Untitled';
+    const html=`<!doctype html><html><head><meta charset="utf-8"><title>${titleTxt}</title><style>body{font-family:'Sarabun','Noto Sans Thai',Arial,sans-serif;padding:24px;}h1{margin:0 0 8px;}.muted{color:#666;font-size:12px;margin-bottom:16px;}pre{white-space:pre-wrap;word-break:break-word;}</style></head><body><h1>${titleTxt}</h1><div class="muted">${t('timestamp')}: ${new Date().toLocaleString(undefined,{timeZoneName:'short'})} (${Intl.DateTimeFormat().resolvedOptions().timeZone})</div><pre>${(lyrics||'').replace(/[&<>]/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]))}</pre></body></html>`;
+    w.document.write(html); w.document.close(); w.focus(); w.print(); }
   function shareEmail(){ const subject=encodeURIComponent(title||'Song Note'); const body=encodeURIComponent(`${t('mood')}: ${mood}\n\n${lyrics}`); window.location.href=`mailto:?subject=${subject}&body=${body}`; }
   return (<div className="grid" style={{gap:12}}>
     <div className="badge hide-on-print">{t('editor')}</div>
@@ -70,7 +80,7 @@ function Editor({ langApi, id, onHome }){
     <div className="grid" style={{gridTemplateColumns:'1fr 1fr 1fr', gap:12}}>
       <label>{t('section')}<select className="select" value={section} onChange={e=>setSection(e.target.value)}>{SECTIONS.map(s=><option key={s}>{s}</option>)}</select></label>
       {section==='Intro' && (<label>{t('introDetail')}<select className="select" value={introType} onChange={e=>setIntroType(e.target.value)}><option>Normal</option><option>Riff</option><option>Instrument</option></select></label>)}
-      {((section==='Intro' && introType!=='Normal') || section==='Solo') ? (<label>{t('instrument')}<select className="select" value={instrument} onChange={e=>setInstrument(e.target.value)}>{INSTRUMENTS.map(i=><option key={i}>{i}</option>)}</select></label>) : <label>&nbsp;<button className="button" onClick={insertSection}>{t('insert')}</button></label>}
+      {((section==='Intro' && introType!=='Normal') || section==='Solo') ? (<label>เครื่องดนตรี<select className="select" value={instrument} onChange={e=>setInstrument(e.target.value)}>{INSTRUMENTS.map(i=><option key={i}>{i}</option>)}</select></label>) : <label>&nbsp;<button className="button" onClick={insertSection}>{t('insert')}</button></label>}
       {((section==='Intro' && introType!=='Normal') || section==='Solo') && (<label>&nbsp;<button className="button" onClick={insertSection}>{t('insert')}</button></label>)}
     </div>
     <label>{t('lyrics')}<textarea className="textarea" value={lyrics} onChange={e=>setLyrics(e.target.value)} placeholder="พิมพ์เนื้อเพลงที่นี่..." /></label>
@@ -85,6 +95,7 @@ function showModal(msg){ let m=document.getElementById('modal'); if(!m){ m=docum
 
 export default function App(){ const langApi=useLang(); const [view,setView]=useState('home'); const [editId,setEditId]=useState(null); const [query,setQuery]=useState('');
   return (<div className="app">
+    <div className="brand-card"><div className="title">บันทึกเพลง | Song Diary</div><div className="subtitle">จดไอเดียเพลงอย่างเรียบง่าย • สองภาษา • PWA</div></div>
     <Header langApi={langApi} onHome={()=>{setView('home'); setEditId(null);}} onNew={()=>{setView('editor'); setEditId(null);}} onSearch={setQuery} query={query} />
     {view==='home' && <Home langApi={langApi} onEdit={(id)=>{setView('editor'); setEditId(id);}} query={query} />}
     {view==='editor' && <Editor langApi={langApi} id={editId} onHome={()=>{setView('home'); setEditId(null);}} />}

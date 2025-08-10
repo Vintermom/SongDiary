@@ -3,9 +3,9 @@
   "short_name": "บันทึกเพลง",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#f4ede1",
-  "theme_color": "#f4ede1",
-  "description": "Song Diary — Minimal cream–brown theme + Black theme, TH/EN, offline.",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "description": "Song Diary — Minimal cream–brown + Black theme, TH/EN, offline.",
   "icons": [
     {
       "src": "icons/icon-192.png",
