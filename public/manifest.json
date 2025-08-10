@@ -1,11 +1,11 @@
 {
-  "name": "จดบันทึก | Song Diary",
-  "short_name": "จดบันทึก",
+  "name": "บันทึกเพลง | Song Diary",
+  "short_name": "บันทึกเพลง",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f4ede1",
   "theme_color": "#f4ede1",
-  "description": "แอพบันทึกเพลง Minimal สองภาษา (TH/EN) + Dark Mode + Offline",
+  "description": "Song Diary — Minimal cream–brown theme + Black theme, TH/EN, offline.",
   "icons": [
     {
       "src": "icons/icon-192.png",
