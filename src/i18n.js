@@ -32,7 +32,14 @@ const tr = {
     sampleLoaded: 'สร้างเพลงตัวอย่างแล้ว',
     updated: 'บันทึกสำเร็จ',
     search: 'ค้นหาเพลง...',
-    instrument: 'เครื่องดนตรี'
+    instrument: 'เครื่องดนตรี',
+    location: 'สถานที่',
+    timezone: 'โซนเวลา',
+    history: 'ประวัติการแก้ไข',
+    currentLocation: 'ตำแหน่งปัจจุบัน (โดยประมาณ)',
+    unknownLocation: 'ไม่ทราบตำแหน่ง',
+    at: 'เมื่อ',
+    place: 'สถานที่'
   },
   en: {
     appName: 'Song Diary',
@@ -67,7 +74,14 @@ const tr = {
     sampleLoaded: 'Sample song created',
     updated: 'Saved',
     search: 'Search songs...',
-    instrument: 'Instrument'
+    instrument: 'Instrument',
+    location: 'Location',
+    timezone: 'Time Zone',
+    history: 'Edit History',
+    currentLocation: 'Current Location (approx.)',
+    unknownLocation: 'Unknown location',
+    at: 'At',
+    place: 'Place'
   }
 };
 
