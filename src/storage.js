@@ -1,7 +1,10 @@
-const LS_KEY = 'song-diary-notes-v1';
+const LS_KEY = 'song-diary-notes-v2'; // bump to v2 for new shape
 
 export function listNotes() {
   return JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+}
+export function overwriteOrder(newArr){
+  localStorage.setItem(LS_KEY, JSON.stringify(newArr));
 }
 export function saveNote(note) {
   const arr = listNotes();
@@ -21,23 +24,11 @@ export function ensureSample(lang) {
   const now = new Date().toISOString();
   const note = {
     id: crypto.randomUUID(),
-    title_th: 'วันสดใสในฤดูร้อน',
-    title_en: 'Summer Pop Day',
-    key: 'C',
+    title: 'วันสดใสในฤดูร้อน / Summer Pop Day',
+    penName: 'Vintermom',
     mood: 'สดใส 😊',
-    sections: {
-      'Intro': 'แดดอุ่น ๆ กับลมเบา ๆ วันนี้คือวันสดใส',
-      'Hook': 'ฮัมไปกับจังหวะใจ Sunshine on my way',
-      'Verse 1': 'เช้าสดใส ใจลอยไปกับท้องฟ้า',
-      'Verse 2': 'เสียงหัวเราะเบา ๆ ของเธออยู่ในอากาศ',
-      'Verse 3': 'เก็บทุกยิ้มไว้ในเพลงของเรา',
-      'Solo': 'Guitar solo 8 bars',
-      'Outro': 'ให้วันดี ๆ ยังคงดังอยู่ในหัวใจ'
-    },
-    lyrics_th: 'Intro...\nHook...\nVerse 1...\nVerse 2...\nVerse 3...\nSolo (Guitar)...\nOutro...',
-    lyrics_en: 'Intro...\nHook...\nVerse 1...\nVerse 2...\nVerse 3...\nSolo (Guitar)...\nOutro...',
+    lyrics: '[Intro]\nแดดอุ่น ๆ กับลมเบา ๆ วันนี้คือวันสดใส\n\n[Hook]\nฮัมไปกับจังหวะใจ Sunshine on my way\n\n[Verse]\nเช้าสดใส ใจลอยไปกับท้องฟ้า',
     notes: 'ตัวอย่างเพลง Pop สดใส',
-    instrument: 'Guitar',
     createdAt: now,
     updatedAt: now
   };

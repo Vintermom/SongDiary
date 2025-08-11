@@ -1,20 +1,21 @@
-const tr = {
+export const tr = {
   th: {
     appName: 'จดบันทึก | Song Diary',
-    addNew: '+ จดบันทึกเพลงใหม่',
+    slogan: 'เก็บบันทึกทุกท่วงทำนอง',
+    addNew: '+ เพิ่มเพลงใหม่',
     edit: 'แก้ไข',
     remove: 'ลบ',
     lastEdited: 'แก้ไขล่าสุด',
     createdAt: 'บันทึกเพลงเมื่อ',
     home: 'หน้าแรก',
-    editor: 'เพิ่ม/แก้ไขเพลง (โหมดโปร)',
+    editor: 'แก้ไขเพลง',
     songTitle: 'ชื่อเพลง',
-    songKey: 'คีย์เพลง',
-    mood: 'อารมณ์เพลง (เช่น 😊 / 🎧)',
+    penName: 'นามปากกา',
+    mood: 'อารมณ์เพลง',
     section: 'ท่อนเพลง',
     insert: 'แทรก',
     lyrics: 'เนื้อเพลง',
-    notes: 'บันทึกของเพลง (ส่วนตัว)',
+    notes: 'บันทึกเพิ่มเติม',
     timestamp: 'วัน–เวลาบันทึก (Local)',
     copyLyrics: 'คัดลอกเนื้อเพลง',
     savePDF: 'บันทึกเป็น PDF',
@@ -24,29 +25,31 @@ const tr = {
     cancel: 'ยกเลิก',
     confirmDelete: 'ลบบันทึกนี้หรือไม่?',
     language: 'ภาษา',
-    theme: 'โหมดสี',
-    light: 'ครีม–น้ำตาล',
-    dark: 'อบอุ่น–ดำ',
+    theme: 'ธีม',
+    light: 'ธีมสีครีม',
+    dark: 'ธีมสีดำ',
     sampleLoaded: 'สร้างเพลงตัวอย่างแล้ว',
-    updated: 'อัปเดตแล้ว',
-    instrument: 'เครื่องดนตรี (Solo)'
+    updated: 'บันทึกแล้ว',
+    instrument: 'เครื่องดนตรี',
+    search: 'ค้นหาเพลง...'
   },
   en: {
     appName: 'Song Diary',
-    addNew: '+ New Song Note',
+    slogan: 'Capture Every Melody',
+    addNew: '+ New Song',
     edit: 'Edit',
     remove: 'Delete',
     lastEdited: 'Last edited',
     createdAt: 'Created',
     home: 'Home',
-    editor: 'Add/Edit Song (Pro Mode)',
-    songTitle: 'Song Title',
-    songKey: 'Song Key',
-    mood: 'Mood (e.g., 😊 / 🎧)',
+    editor: 'Edit Song',
+    songTitle: 'Title',
+    penName: 'Pen name',
+    mood: 'Mood',
     section: 'Section',
     insert: 'Insert',
     lyrics: 'Lyrics',
-    notes: 'Notes (private)',
+    notes: 'Additional notes',
     timestamp: 'Local Timestamp',
     copyLyrics: 'Copy Lyrics',
     savePDF: 'Save as PDF',
@@ -57,11 +60,12 @@ const tr = {
     confirmDelete: 'Delete this note?',
     language: 'Language',
     theme: 'Theme',
-    light: 'Cream–Brown',
-    dark: 'Warm–Black',
+    light: 'Cream theme',
+    dark: 'Dark theme',
     sampleLoaded: 'Sample song created',
-    updated: 'Updated',
-    instrument: 'Instrument (Solo)'
+    updated: 'Saved',
+    instrument: 'Instrument',
+    search: 'Search songs...'
   }
 };
 
@@ -72,6 +76,7 @@ export function setLang(lang) {
   localStorage.setItem('lang', lang);
 }
 export function t(lang, key) { return tr[lang][key] || key; }
-export const SECTIONS = ['Intro','Hook','Verse 1','Verse 2','Verse 3','Solo','Outro'];
-export const KEYS = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B','Bm','Em'];
-export const INSTRUMENTS = ['Guitar','Piano','Violin','Saxophone','Flute','Synth'];
+
+// Sections (added Pre-Chorus, Bridge, Rap, Riff; use generic 'Verse')
+export const SECTIONS = ['Intro','Pre-Chorus','Verse','Bridge','Rap','Hook','Solo','Riff','Outro'];
+export const INSTRUMENTS = ['Guitar','Piano','Violin','Saxophone','Flute','Synth','Drums','Bass'];
