@@ -167,7 +167,6 @@ function Editor({ langApi, id, onHome }){
 
   return (
     <div className="grid" style={{gap:12}}>
-      {/* หัวข้อแบบไม่มีกรอบ ใช้เส้นคั่น */}
       <h2 className="section-title">
         {id ? (lang==='th' ? 'แก้ไขเพลง' : 'Edit Song') : (lang==='th' ? 'เพิ่มเพลง' : 'New Song')}
       </h2>
