@@ -9,7 +9,7 @@ const tr = {
     lastEdited: 'แก้ไขล่าสุด',
     createdAt: 'บันทึกเพลงเมื่อ',
     home: 'หน้าแรก',
-    editor: 'แก้ไขเพลง',
+    editor: 'จดบันทึกเพลง',
     songTitle: 'ชื่อเพลง',
     penName: 'นามปากกา',
     mood: 'อารมณ์เพลง',
