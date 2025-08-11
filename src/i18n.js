@@ -17,7 +17,7 @@ const tr = {
     insert: 'แทรก',
     lyrics: 'เนื้อเพลง',
     notes: 'บันทึกเพิ่มเติม',
-    timestamp: 'วัน–เวลาบันทึก (Local)',
+    timestamp: 'วันเวลาบันทึก',
     copyLyrics: 'คัดลอกเนื้อเพลง',
     savePDF: 'บันทึกเป็น PDF',
     print: 'พิมพ์',
@@ -77,5 +77,5 @@ export function getLang() {
 export function setLang(lang) { localStorage.setItem('lang', lang); }
 export function t(lang, key) { return tr[lang][key] || key; }
 
-export const SECTIONS = ['Intro','Pre-Chorus','Hook','Verse 1','Verse 2','Verse 3','Bridge','Rap','Riff','Solo','Outro'];
+export const SECTIONS = ['Intro','Pre-Chorus','Chorus','Verse 1','Verse 2','Verse 3','Bridge','Rap','Riff','Solo','Outro'];
 export const INSTRUMENTS = ['Guitar','Piano','Violin','Saxophone','Flute','Synth'];
