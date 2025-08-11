@@ -5,7 +5,7 @@
   "display": "standalone",
   "background_color": "#f4ede1",
   "theme_color": "#f4ede1",
-  "description": "แอพบันทึกเพลง Minimal สองภาษา (TH/EN) + Dark Mode + Offline",
+  "description": "Song Diary — Minimal TH/EN PWA for song notes",
   "icons": [
     {
       "src": "icons/icon-192.png",

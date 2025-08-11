@@ -1,8 +1,9 @@
-export const tr = {
+const tr = {
   th: {
     appName: 'จดบันทึก | Song Diary',
-    slogan: 'เก็บบันทึกทุกท่วงทำนอง',
-    addNew: '+ เพิ่มเพลงใหม่',
+    slogan: 'เก็บทุกเมโลดี้ให้เป็นเรื่องราว',
+    version: 'Version',
+    addNew: '+ เพิ่มเพลง',
     edit: 'แก้ไข',
     remove: 'ลบ',
     lastEdited: 'แก้ไขล่าสุด',
@@ -25,17 +26,18 @@ export const tr = {
     cancel: 'ยกเลิก',
     confirmDelete: 'ลบบันทึกนี้หรือไม่?',
     language: 'ภาษา',
-    theme: 'ธีม',
-    light: 'ธีมสีครีม',
-    dark: 'ธีมสีดำ',
+    theme: 'โหมดสี',
+    themeDark: 'ธีมสีดำ',
+    themeLight: 'ธีมสีครีม',
     sampleLoaded: 'สร้างเพลงตัวอย่างแล้ว',
-    updated: 'บันทึกแล้ว',
-    instrument: 'เครื่องดนตรี',
-    search: 'ค้นหาเพลง...'
+    updated: 'บันทึกสำเร็จ',
+    search: 'ค้นหาเพลง...',
+    instrument: 'เครื่องดนตรี'
   },
   en: {
     appName: 'Song Diary',
-    slogan: 'Capture Every Melody',
+    slogan: 'Capture every melody',
+    version: 'Version',
     addNew: '+ New Song',
     edit: 'Edit',
     remove: 'Delete',
@@ -43,15 +45,15 @@ export const tr = {
     createdAt: 'Created',
     home: 'Home',
     editor: 'Edit Song',
-    songTitle: 'Title',
+    songTitle: 'Song Title',
     penName: 'Pen name',
     mood: 'Mood',
     section: 'Section',
     insert: 'Insert',
     lyrics: 'Lyrics',
     notes: 'Additional notes',
-    timestamp: 'Local Timestamp',
-    copyLyrics: 'Copy Lyrics',
+    timestamp: 'Local timestamp',
+    copyLyrics: 'Copy lyrics',
     savePDF: 'Save as PDF',
     print: 'Print',
     shareEmail: 'Share via Email',
@@ -60,23 +62,20 @@ export const tr = {
     confirmDelete: 'Delete this note?',
     language: 'Language',
     theme: 'Theme',
-    light: 'Cream theme',
-    dark: 'Dark theme',
+    themeDark: 'Dark Theme',
+    themeLight: 'Cream Theme',
     sampleLoaded: 'Sample song created',
     updated: 'Saved',
-    instrument: 'Instrument',
-    search: 'Search songs...'
+    search: 'Search songs...',
+    instrument: 'Instrument'
   }
 };
 
 export function getLang() {
   return localStorage.getItem('lang') || (navigator.language?.startsWith('th') ? 'th' : 'en');
 }
-export function setLang(lang) {
-  localStorage.setItem('lang', lang);
-}
+export function setLang(lang) { localStorage.setItem('lang', lang); }
 export function t(lang, key) { return tr[lang][key] || key; }
 
-// Sections (added Pre-Chorus, Bridge, Rap, Riff; use generic 'Verse')
-export const SECTIONS = ['Intro','Pre-Chorus','Verse','Bridge','Rap','Hook','Solo','Riff','Outro'];
-export const INSTRUMENTS = ['Guitar','Piano','Violin','Saxophone','Flute','Synth','Drums','Bass'];
+export const SECTIONS = ['Intro','Pre-Chorus','Hook','Verse 1','Verse 2','Verse 3','Bridge','Rap','Riff','Solo','Outro'];
+export const INSTRUMENTS = ['Guitar','Piano','Violin','Saxophone','Flute','Synth'];

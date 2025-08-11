@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { t, getLang, setLang, SECTIONS, INSTRUMENTS, tr } from './i18n.js';
-import { listNotes, saveNote, deleteNote, getNote, ensureSample, overwriteOrder } from './storage.js';
+import { t, getLang, setLang, SECTIONS, INSTRUMENTS } from './i18n.js';
+import { listNotes, saveNote, deleteNote, getNote, ensureSample, reorderNotes } from './storage.js';
 
 const APP_VERSION = '1.0.0';
 
@@ -18,7 +18,7 @@ function useLang() {
   };
 }
 
-function Header({ langApi, onHome, onNew }) {
+function Header({ langApi, onHome, onNew, query, setQuery }) {
   const { lang, setLang, t } = langApi;
   const [isDark, setIsDark] = React.useState(() =>
     document.documentElement.classList.contains('dark') ||
@@ -29,27 +29,25 @@ function Header({ langApi, onHome, onNew }) {
     localStorage.setItem('theme', dark ? 'dark' : 'light');
     setIsDark(dark);
   }
+  function toggleTheme(){ applyTheme(!isDark); }
+
   return (
-    <div>
-      <div className="header-card">
-        <div className="brand">{lang==='th' ? 'จดบันทึก | Song Diary' : 'Song Diary'}</div>
-        <div className="slogan">{tr[lang].slogan}</div>
-        <div className="small-muted">Version {APP_VERSION}</div>
+    <div className="header-card">
+      <div>
+        <div className="brand">{t('appName')}</div>
+        <div className="slogan">{t('slogan')} • <span className="small-muted">{t('version')} {APP_VERSION}</span></div>
       </div>
-      <div className="header" style={{gap:12, justifyContent:'space-between'}}>
-        <div className="toolbar">
-          <select className="select" value={lang} onChange={(e)=>setLang(e.target.value)} aria-label={t('language')}>
-            <option value="th">ไทย</option>
-            <option value="en">English</option>
-          </select>
-          <button className="button" onClick={()=>applyTheme(!isDark)} aria-label={t('theme')}>
-            {isDark ? t('light') : t('dark')}
-          </button>
-        </div>
-        <div className="toolbar">
-          <button className="button primary" onClick={onNew}>{t('addNew')}</button>
-          <button className="button" onClick={onHome}>{t('home')}</button>
-        </div>
+      <div className="toolbar">
+        <input className="input" style={{minWidth:200}} placeholder={t('search')} value={query} onChange={e=>setQuery(e.target.value)} />
+        <select className="select" value={lang} onChange={(e)=>setLang(e.target.value)} aria-label={t('language')}>
+          <option value="th">ไทย</option>
+          <option value="en">English</option>
+        </select>
+        <button className="button" onClick={toggleTheme} aria-label={t('theme')}>
+          {isDark ? t('themeLight') : t('themeDark')}
+        </button>
+        <button className="button primary" onClick={onNew}>{t('addNew')}</button>
+        <button className="button" onClick={onHome}>{t('home')}</button>
       </div>
     </div>
   );
@@ -58,7 +56,7 @@ function Header({ langApi, onHome, onNew }) {
 function Home({ langApi, onEdit }) {
   const { t, lang } = langApi;
   const [notes, setNotes] = useState([]);
-  const [q, setQ] = useState('');
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     const isNew = ensureSample(lang);
@@ -66,56 +64,46 @@ function Home({ langApi, onEdit }) {
     if (isNew) toast(t('sampleLoaded'));
   }, [lang]);
 
-  function onDragStart(e, idx){
-    e.dataTransfer.setData('text/plain', String(idx));
-    e.currentTarget.classList.add('dragging');
-  }
-  function onDragEnd(e){
-    e.currentTarget.classList.remove('dragging');
-  }
-  function onDragOver(e){ e.preventDefault(); }
-  function onDrop(e, idx){
-    e.preventDefault();
-    const from = parseInt(e.dataTransfer.getData('text/plain'));
-    if (isNaN(from) || from === idx) return;
-    const arr = [...notes];
-    const [moved] = arr.splice(from,1);
-    arr.splice(idx,0,moved);
-    overwriteOrder(arr);
-    setNotes(arr);
-  }
-
   const filtered = notes.filter(n => {
-    const title = n.title || n.title_th || n.title_en || '';
-    const pen = n.penName || '';
-    const hay = (title + ' ' + pen).toLowerCase();
-    return hay.includes(q.toLowerCase());
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    return (n.title||'').toLowerCase().includes(q) || (n.penName||'').toLowerCase().includes(q);
   });
+
+  // Drag & drop
+  const [dragId, setDragId] = useState(null);
+  function onDragStart(id){ setDragId(id); }
+  function onDragOver(e){ e.preventDefault(); }
+  function onDrop(targetId){
+    if (!dragId || dragId===targetId) return;
+    const ids = [...filtered];
+    const arr = notes.map(n=>n.id);
+    const from = arr.indexOf(dragId);
+    const to = arr.indexOf(targetId);
+    if (from<0 || to<0) return;
+    const newArr = [...arr];
+    const [m] = newArr.splice(from,1);
+    newArr.splice(to,0,m);
+    reorderNotes(newArr);
+    setNotes(listNotes());
+  }
 
   return (
     <div>
-      <div className="searchbar">
-        <input className="input" placeholder={t('search')} value={q} onChange={e=>setQ(e.target.value)} />
-      </div>
+      <Header langApi={langApi} onHome={()=>{}} onNew={()=>onEdit(null)} query={query} setQuery={setQuery} />
       <div className="grid cards">
-        {filtered.map((n, idx) => {
+        {filtered.map(n => {
           const created = n.createdAt || n.updatedAt;
           const edited  = n.updatedAt;
           const label   = (!edited || edited === created) ? t('createdAt') : t('lastEdited');
           const when    = new Date((edited || created)).toLocaleString();
-          const title = n.title || (lang === 'th' ? (n.title_th || n.title_en) : (n.title_en || n.title_th));
           return (
-            <div className="card"
-              key={n.id}
-              draggable
-              onDragStart={(e)=>onDragStart(e, idx)}
-              onDragEnd={onDragEnd}
-              onDragOver={onDragOver}
-              onDrop={(e)=>onDrop(e, idx)}
-            >
-              <div className="title">{title}</div>
+            <div className="card" key={n.id} draggable onDragStart={()=>onDragStart(n.id)} onDragOver={onDragOver} onDrop={()=>onDrop(n.id)}>
+              <div className="title">
+                <span className="handle">☰</span>{' '}
+                {n.title} {n.penName ? <span className="small-muted">• {n.penName}</span> : null}
+              </div>
               <div className="muted">{label}: {when}</div>
-              {n.penName && <div className="muted">{t('penName')}: {n.penName}</div>}
               <div className="nav">
                 <button className="button" onClick={()=>onEdit(n.id)}>{t('edit')}</button>
                 <button className="button danger" onClick={()=>{ if (confirm(t('confirmDelete'))) { deleteNote(n.id); setNotes(listNotes()); }}}>{t('remove')}</button>
@@ -133,45 +121,35 @@ function Home({ langApi, onEdit }) {
 function Editor({ langApi, id, onHome }){
   const { t, lang } = langApi;
   const existing = id ? getNote(id) : null;
-  const [title, setTitle] = useState(existing?.title || existing?.title_th || existing?.title_en || '');
+  const [title, setTitle] = useState(existing?.title || '');
   const [penName, setPenName] = useState(existing?.penName || '');
   const [mood, setMood] = useState(existing?.mood || '');
-  const [lyrics, setLyrics] = useState(existing?.lyrics || existing?.lyrics_th || existing?.lyrics_en || '');
+  const [lyrics, setLyrics] = useState(existing?.lyrics || '');
   const [notes, setNotes] = useState(existing?.notes || '');
   const [section, setSection] = useState('Intro');
   const [instrument, setInstrument] = useState(existing?.instrument || 'Guitar');
-  const [saved, setSaved] = useState(false);
 
   useEffect(()=>{ window.scrollTo({ top:0, behavior:'smooth' }); },[]);
 
-  const timestamp = useMemo(()=> new Date().toLocaleString(), [title, lyrics, mood, instrument, notes, penName]);
+  const timestamp = useMemo(()=> new Date().toLocaleString(), [title, penName, lyrics, mood, instrument, notes]);
 
   function insertSection() {
-    let label = `[${section}]`;
-    if (section === 'Intro' || section === 'Solo' || section === 'Riff') {
-      label = `[${section}: ${instrument}]`;
-    }
-    setLyrics(prev => (prev ? prev + '\n\n' : '') + label + '\n');
+    const special = ['Intro','Solo','Riff'];
+    const label = special.includes(section) ? `[${section}: ${instrument}]` : `[${section}]`;
+    setLyrics(prev => (prev ? prev + '\n' : '') + label + '\n');
   }
 
   function onSave(){
     const now = new Date().toISOString();
     const data = {
       id: existing?.id || crypto.randomUUID(),
-      title,
-      title_th: title, // keep legacy
-      title_en: title,
-      penName,
-      mood,
-      lyrics,
-      notes,
-      instrument,
+      title, penName, mood, lyrics, notes, instrument,
       createdAt: existing?.createdAt || now,
-      updatedAt: now
+      updatedAt: now,
+      order: existing?.order ?? undefined
     };
     saveNote(data);
-    setSaved(true);
-    setTimeout(()=>setSaved(false), 1300);
+    toast(t('updated'));
     onHome();
   }
 
@@ -182,58 +160,61 @@ function Editor({ langApi, id, onHome }){
 
   function printPDF(){
     const w = window.open('', '_blank');
-    const titleOut = title || 'Untitled';
-    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${titleOut}</title>
+    const titleTxt = title || 'Untitled';
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${titleTxt}</title>
       <style>
         body { font-family: 'Sarabun','Noto Sans Thai', Arial, sans-serif; padding: 24px; }
         h1 { margin: 0 0 8px; }
         .muted { color:#666; font-size:12px; margin-bottom: 16px; }
         pre { white-space: pre-wrap; word-break: break-word; }
       </style></head><body>
-      <h1>${titleOut}</h1>
+      <h1>${titleTxt}</h1>
       <div class="muted">${t('timestamp')}: ${new Date().toLocaleString()}</div>
       <pre>${(lyrics||'').replace(/[&<>]/g, s=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[s]))}</pre>
       </body></html>`;
     w.document.write(html);
-    w.document.close();
-    w.focus();
-    w.print();
+    w.document.close(); w.focus(); w.print();
   }
 
   function shareEmail(){
     const subject = encodeURIComponent(title || 'Song Note');
-    const body = encodeURIComponent(`${t('penName')}: ${penName}\n${t('mood')}: ${mood}\n\n${lyrics}`);
+    const body = encodeURIComponent(`${t('mood')}: ${mood}\n${t('lyrics')}\n\n${lyrics}`);
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
   }
 
   return (
     <div className="grid" style={{gap:12}}>
-      <h2 className="section-title">{t('editor')}</h2>
-      <div className="divider" />
+      <div className="header-card" style={{marginTop:4}}>
+        <div>
+          <div className="brand">{t('editor')}</div>
+          <div className="slogan">{t('slogan')} • <span className="small-muted">{t('version')} {APP_VERSION}</span></div>
+        </div>
+      </div>
 
       <label>
         {t('songTitle')}
-        <input className="input" value={title} onChange={e=>setTitle(e.target.value)} placeholder={lang==='th'?'เช่น ฤดูฝนแรก':'e.g., First Rain'} />
+        <input className="input" value={title} onChange={e=>setTitle(e.target.value)} placeholder={lang==='th'?'ใส่ชื่อเพลง':'Song title'} />
       </label>
 
-      <label>
-        {t('penName')}
-        <input className="input" value={penName} onChange={e=>setPenName(e.target.value)} placeholder={lang==='th'?'เช่น นามปากกาของคุณ':'e.g., your alias'} />
-      </label>
+      <div className="grid two">
+        <label>
+          {t('penName')}
+          <input className="input" value={penName} onChange={e=>setPenName(e.target.value)} placeholder={lang==='th'?'เช่น นามปากกา':'e.g., pen name'} />
+        </label>
+        <label>
+          {t('mood')}
+          <input className="input" value={mood} onChange={e=>setMood(e.target.value)} placeholder={lang==='th'?'เช่น สดใส 😊':'e.g., bright 😊'} />
+        </label>
+      </div>
 
-      <label>
-        {t('mood')}
-        <input className="input" value={mood} onChange={e=>setMood(e.target.value)} placeholder={lang==='th'?'สดใส':'Bright'} />
-      </label>
-
-      <div className="grid" style={{gridTemplateColumns:'1fr 1fr 1fr', gap:12}}>
+      <div className="grid two" style={{alignItems:'end'}}>
         <label>
           {t('section')}
           <select className="select" value={section} onChange={e=>setSection(e.target.value)}>
             {SECTIONS.map(s => <option key={s}>{s}</option>)}
           </select>
         </label>
-        {(section === 'Intro' || section === 'Solo' || section === 'Riff') && (
+        {['Intro','Solo','Riff'].includes(section) && (
           <label>
             {t('instrument')}
             <select className="select" value={instrument} onChange={e=>setInstrument(e.target.value)}>
@@ -267,15 +248,6 @@ function Editor({ langApi, id, onHome }){
         <button className="button primary" onClick={onSave}>{t('save')}</button>
         <button className="button" onClick={onHome}>{t('cancel')}</button>
       </div>
-
-      {saved && (
-        <div className="modal" role="dialog" aria-modal="true">
-          <div className="box">
-            <div style={{fontWeight:700, marginBottom:8}}>{t('updated')}</div>
-            <button className="button" onClick={()=>setSaved(false)}>OK</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -283,7 +255,7 @@ function Editor({ langApi, id, onHome }){
 function toast(msg){
   const el = document.createElement('div');
   el.textContent = msg;
-  Object.assign(el.style, { position:'fixed', left:'50%', bottom:'24px', transform:'translateX(-50%)', background:'#000', color:'#fff', padding:'10px 14px', borderRadius:'999px', opacity:'0.9', zIndex:9999 });
+  Object.assign(el.style, { position:'fixed', left:'50%', bottom:'24px', transform:'translateX(-50%)', background:'#000', color:'#fff', padding:'10px 14px', borderRadius:'12px', opacity:'0.94', zIndex:9999, boxShadow:'0 6px 24px rgba(0,0,0,.25)' });
   document.body.appendChild(el);
   setTimeout(()=>{ el.remove(); }, 1800);
 }
@@ -299,7 +271,6 @@ export default function App(){
 
   return (
     <div className="app">
-      <Header langApi={langApi} onHome={goHome} onNew={goNew} />
       {view === 'home' && <Home langApi={langApi} onEdit={goEdit} />}
       {view === 'editor' && <Editor langApi={langApi} id={editId} onHome={goHome} />}
     </div>
