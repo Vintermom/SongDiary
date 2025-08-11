@@ -1,0 +1,21 @@
+{
+  "name": "จดบันทึก | Song Diary",
+  "short_name": "จดบันทึก",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f4ede1",
+  "theme_color": "#f4ede1",
+  "description": "Song Diary — Minimal TH/EN PWA for song notes",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
